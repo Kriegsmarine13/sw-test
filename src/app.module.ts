@@ -16,7 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: 60000,
+          ttl: 60,
           limit: 10,
         },
       ],
@@ -31,7 +31,9 @@ import { APP_GUARD } from '@nestjs/core';
       username: process.env.DB_USER || 'configuser',
       password: process.env.DB_PASSWORD || 'configpass',
       database: process.env.DB_NAME || 'configdb',
+      entities: [Asset, Definition],
       synchronize: true,
+      logging: true,
       autoLoadEntities: true,
       retryAttempts: 10,
       retryDelay: 2000,

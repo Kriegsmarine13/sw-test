@@ -103,3 +103,41 @@ FROM (SELECT 'android', '14.8.98', '3cf8d7c4f083887f2212fc41d606c7f6951964fc57b4
       UNION ALL
       SELECT 'ios', '12.1.761', 'd20350e978ead423de633264da8b23afafb13c751c1811afc53591c92096892d') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM definition LIMIT 1);
+
+
+-- Попытка переезда на версии в разных колонках
+
+ALTER TABLE asset
+    ADD COLUMN major INT NULL,
+    ADD COLUMN minor INT NULL,
+    ADD COLUMN patch INT NULL;
+
+ALTER TABLE definition
+    ADD COLUMN major INT NULL,
+    ADD COLUMN minor INT NULL,
+    ADD COLUMN patch INT NULL;
+
+-- заполняем из строки вида MAJOR.MINOR.PATCH
+UPDATE asset
+SET
+    major = CAST(SUBSTRING_INDEX(version, '.', 1) AS UNSIGNED),
+    minor = CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(version, '.', 2), '.', -1) AS UNSIGNED),
+    patch = CAST(SUBSTRING_INDEX(version, '.', -1) AS UNSIGNED);
+
+UPDATE definition
+SET
+    major = CAST(SUBSTRING_INDEX(version, '.', 1) AS UNSIGNED),
+    minor = CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(version, '.', 2), '.', -1) AS UNSIGNED),
+    patch = CAST(SUBSTRING_INDEX(version, '.', -1) AS UNSIGNED);
+
+ALTER TABLE asset
+    MODIFY major INT NOT NULL,
+    MODIFY minor INT NOT NULL,
+    MODIFY patch INT NOT NULL,
+    ADD INDEX idx_asset_platform_major (platform, major);
+
+ALTER TABLE definition
+    MODIFY major INT NOT NULL,
+    MODIFY minor INT NOT NULL,
+    MODIFY patch INT NOT NULL,
+    ADD INDEX idx_definition_platform_major_minor (platform, major, minor);

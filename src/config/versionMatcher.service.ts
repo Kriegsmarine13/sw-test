@@ -1,48 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import {
-  isCompatibleAssets,
-  isCompatibleDefinitions,
-} from '../common/utils/semver.utils';
-import { VersionedItem } from '../data/types/config.types';
+import { Asset } from '../data/entities/asset.entity';
+import { Definition } from '../data/entities/definition.entity';
 
-@Injectable()
+function parseParts(v: string): [number, number, number] {
+  const [maj = '0', min = '0', pat = '0'] = v.split('.');
+  return [parseInt(maj, 10), parseInt(min, 10), parseInt(pat, 10)];
+}
+
 export class VersionMatcherService {
   matchAssets(
     clientVersion: string,
     forcedVersion: string | undefined,
-    available: VersionedItem[],
-  ): VersionedItem | null {
+    available: Asset[],
+  ): Asset | null {
+    const [cMaj] = parseParts(clientVersion);
     if (forcedVersion) {
-      const exact = available.find((v) => v.version === forcedVersion);
-      if (exact && isCompatibleAssets(clientVersion, forcedVersion)) {
-        return exact;
-      }
+      const [fMaj, fMin, fPat] = parseParts(forcedVersion);
+      const found = available.find(
+        (a) => a.major === fMaj && a.minor === fMin && a.patch === fPat,
+      );
+      if (found && found.major === cMaj) return found;
       return null;
     }
-
-    return (
-      available.find((v) => isCompatibleAssets(clientVersion, v.version)) ||
-      null
-    );
+    return available.find((a) => a.major === cMaj) || null;
   }
 
   matchDefinitions(
     clientVersion: string,
     forcedVersion: string | undefined,
-    available: VersionedItem[],
-  ): VersionedItem | null {
+    available: Definition[],
+  ): Definition | null {
+    const [cMaj, cMin] = parseParts(clientVersion);
     if (forcedVersion) {
-      const exact = available.find((v) => v.version === forcedVersion);
-      if (exact && isCompatibleDefinitions(clientVersion, forcedVersion)) {
-        return exact;
-      }
+      const [fMaj, fMin, fPat] = parseParts(forcedVersion);
+      const found = available.find(
+        (d) => d.major === fMaj && d.minor === fMin && d.patch === fPat,
+      );
+      if (found && found.major === cMaj && found.minor === cMin) return found;
       return null;
     }
-
-    return (
-      available.find((v) =>
-        isCompatibleDefinitions(clientVersion, v.version),
-      ) || null
-    );
+    return available.find((d) => d.major === cMaj && d.minor === cMin) || null;
   }
 }
