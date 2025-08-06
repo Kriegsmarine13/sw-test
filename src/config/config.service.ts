@@ -5,7 +5,7 @@ import { GetConfigDto } from './dto/getConfig.dto';
 import { DataService } from '../data/data.service';
 import { VersionMatcherService } from './versionMatcher.service';
 import { ConfigResponse, VersionedItem } from '../data/types/config.types';
-import { KeyvCacheService} from '../cache/keyv-cache.service';
+import { KeyvCacheService } from '../cache/keyv-cache.service';
 
 const CACHE_TTL = 1000 * 60 * 5;
 
