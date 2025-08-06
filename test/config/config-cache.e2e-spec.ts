@@ -20,9 +20,7 @@ describe('ConfigService cache integration', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        EnvConfigModule.forRoot({ isGlobal: true }), // <- обязательно для env/config
-      ],
+      imports: [EnvConfigModule.forRoot({ isGlobal: true })],
       controllers: [ConfigController],
       providers: [
         ConfigService,
@@ -82,7 +80,6 @@ describe('ConfigService cache integration', () => {
   });
 
   it('invalidates cache when underlying definition hash changes', async () => {
-    // подменяем возвращаемое определение (изменился hash)
     (matcher as any).matchDefinitions = jest.fn().mockReturnValue({
       version: '14.2.999',
       hash: 'different-hash',
@@ -94,7 +91,6 @@ describe('ConfigService cache integration', () => {
       .expect(200);
 
     expect(res3.body.definitions.hash).toBe('different-hash');
-    // matchDefinitions вызвался снова
     expect((matcher as any).matchDefinitions).toHaveBeenCalled();
   });
 });

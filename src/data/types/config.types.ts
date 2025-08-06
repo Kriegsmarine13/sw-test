@@ -3,16 +3,6 @@ export interface VersionedItem {
   hash: string;
 }
 
-export interface PlatformData {
-  android: VersionedItem[];
-  ios: VersionedItem[];
-}
-
-export interface ConfigDataStore {
-  assets: PlatformData;
-  definitions: PlatformData;
-}
-
 export interface ConfigResponse {
   version: {
     required: string;

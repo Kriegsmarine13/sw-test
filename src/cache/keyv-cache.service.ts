@@ -1,4 +1,3 @@
-// src/cache/keyv-cache.service.ts
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
 import { Injectable, Logger } from '@nestjs/common';
@@ -36,14 +35,14 @@ export class KeyvCacheService {
     }
   }
 
-  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+  async set<T>(key: string, value: T, ttlMilliseconds?: number): Promise<void> {
     try {
-      if (ttlSeconds !== undefined) {
-        await this.keyv.set(key, value, ttlSeconds);
+      if (ttlMilliseconds !== undefined) {
+        await this.keyv.set(key, value, ttlMilliseconds);
       } else {
         await this.keyv.set(key, value); // использует дефолтный
       }
-      this.logger.debug(`Cache SET key=${key} ttl=${ttlSeconds ?? '(default)'}`);
+      this.logger.debug(`Cache SET key=${key} ttl=${ttlMilliseconds ?? '(default)'}`);
     } catch (e) {
       this.logger.warn('Cache set failed', e);
     }

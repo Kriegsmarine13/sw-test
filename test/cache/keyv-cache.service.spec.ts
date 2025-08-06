@@ -4,7 +4,6 @@ describe('KeyvCacheService', () => {
   let cache: KeyvCacheService;
 
   beforeEach(() => {
-    // При создании без REDIS_URI он использует внутренний Map (in-memory)
     process.env.REDIS_HOST = ''; // чтобы не подключался к реальному redis
     cache = new KeyvCacheService();
   });
@@ -12,7 +11,7 @@ describe('KeyvCacheService', () => {
   it('set/get works and returns stored value', async () => {
     const key = 'test:key1';
     const payload = { a: 1, b: 'two' };
-    await cache.set(key, payload, 2); // TTL 2 секунды
+    await cache.set(key, payload, 2000);
     const got = await cache.get<typeof payload>(key);
     expect(got).toEqual(payload);
   });
@@ -20,11 +19,10 @@ describe('KeyvCacheService', () => {
   it('expires after TTL', async () => {
     jest.useFakeTimers();
     const key = 'test:key-expire';
-    await cache.set(key, 'value', 1); // 1 сек
+    await cache.set(key, 'value', 1000);
     let got = await cache.get<string>(key);
     expect(got).toBe('value');
 
-    // продвинуть время на 2 секунды
     jest.advanceTimersByTime(2000);
     got = await cache.get<string>(key);
     expect(got).toBeUndefined();

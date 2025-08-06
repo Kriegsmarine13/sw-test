@@ -1,4 +1,3 @@
-// test/app.e2e-spec.ts
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
